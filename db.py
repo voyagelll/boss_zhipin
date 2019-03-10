@@ -59,7 +59,6 @@ class RedisClient(object):
 
 
 class Mongo(object):
-	# def __init__(self):
 	def save_data(self, info):
 		if collection.insert(info):
 			print('save successfully...')
@@ -74,9 +73,9 @@ if __name__ == '__main__':
 	# urls = [x.decode('utf-8') for x in urls]
 	# print(urls)
 
-	# print(redis.count())
+	print(redis.count())
 
-	print(redis.get_proxy())
+	# print(redis.get_proxy())
 
 
 

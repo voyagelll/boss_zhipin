@@ -9,6 +9,7 @@ from fake_useragent import UserAgent
 # gevent.monkey.patch_all()
 # from gevent import Timeout 
 # from gevent.pool import Pool
+from multiprocessing.dummy import Pool 
 from db import *
 
 ua = UserAgent() 
@@ -16,19 +17,38 @@ redis = RedisClient()
 mongo = Mongo()
 
 
-def coroutine(url):
-	if redis.count():
+class parseUrl(object):
+	def main(self):
+		url_num = redis.count()
+		print('当前剩余url：%s' % url_num)
+		if url_num>50:
+			urls = [url.decode('utf-8') for url in redis.get_all_urls()][:100]
+			# 多线程
+			pool = Pool(10)
+			pool.map(self.coroutine, urls)
+			pool.close()
+			pool.join()
+
+			# # 协程
+			# pool = Pool(50)
+			# pool.map(self.coroutine, [url for url in urls])
+			# pool.kill()
+			# pool.join()
+		elif 0<url_num<50:
+			urls = [url.decode('utf-8') for url in redis.get_all_urls]
+			for url in urls:
+				self.coroutine(urls)
+		else:
+			time.sleep(30)
+
+	def coroutine(self, url):
 		headers = {'User-Agent': ua.random}
 		proxies = redis.get_proxy()
-		# rsp = requests.get(url, headers=headers, proxies=proxies)
-		# print(rsp)
 		try:
-			rsp = requests.get(url, headers=headers)
-			# rsp = requests.get(url, headers=headers, proxies=proxies)
+			# rsp = requests.get(url, headers=headers)
+			rsp = requests.get(url, headers=headers, proxies=proxies)
 			text = etree.HTML(rsp.text)
 		except:
-			# redis.add_url(url)
-			# print(e)
 			pass
 		else:
 			print(redis.count(), url)
@@ -99,16 +119,9 @@ def coroutine(url):
 				info['release_time'] = 0
 			# print(info)
 			mongo.save_data(info)
+			time.sleep(3)
 
 
 if __name__ == '__main__':
-	# coroutine(redis.get_url())
-
-	# urls = redis.get_all_urls()
-	# urls = [x.decode('utf-8') for x in urls]
-	# pool = Pool()
-	# pool.map(coroutine, [url for url in urls])
-	# pool.kill()
-	# pool.join()
-
-	coroutine('https://www.zhipin.com/job_detail/2ccbe10e376ea6451HRy3dy-FlE~.html')
+	p = parseUrl()
+	p.main()
