@@ -2,8 +2,7 @@
 # boss_zhipin职位爬取和分析
 项目主要是爬取boss直聘并分析职位数据。
 
-## 爬取(职位自行改，城市需要拿到正确的城市代码（url：https://www.zhipin.com/common/data/city.json)：
-
+## 爬取(职位自行改，城市需要拿到正确的城市代码。（城市代码url：https://www.zhipin.com/common/data/city.json ）
 * 爬取职位：爬虫，数据分析，数据挖掘。
 
 * 爬取城市：北京，上海，广州，深圳，杭州，苏州，武汉，成都，厦门，西安。
